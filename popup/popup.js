@@ -7,7 +7,7 @@ const reset = () => {
     chrome.cookies.remove({
         url: 'https://www.gog.com',
         name: 'gog_lc'
-    });
+    })
 }
 
 const save = () => {
@@ -31,13 +31,13 @@ const restore = () => {
             regionInput.value = `${region}_${currency}`
             languageInput.value = language
         }
-    });
+    })
 }
 
 const reloadPage = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.tabs.reload(tabs[0].id)
-    });
+    })
 }
 
 saveButton.addEventListener('click', () => {
