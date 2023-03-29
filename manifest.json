@@ -1,0 +1,17 @@
+{
+    "name": "GOG LC TOOL",
+    "description": "Change GOG local",
+    "version": "1.0",
+    "manifest_version": 3,
+    "host_permissions": [
+        "*://*.gog.com/*"
+    ],
+    "permissions": [
+        "cookies",
+        "tabs"
+    ],
+    "action": {
+        "default_popup": "popup/popup.html"
+    },
+    "homepage_url": "https://github.com/nini22P/gog-lc-tool"
+}
