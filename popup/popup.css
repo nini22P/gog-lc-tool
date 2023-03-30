@@ -4,6 +4,15 @@ body {
     color: #3b3b3b;
 }
 
+a {
+    text-decoration: none;
+    color: #5f0d63;
+}
+
+.max-content-width {
+    width: max-content;
+}
+
 select {
     font-size: 1rem;
     padding: 0.25rem;
@@ -50,6 +59,10 @@ select {
     body {
         background-color: #3b3b3b;
         color: #f7f7f7;
+    }
+
+    a {
+        color: #ac3bb0
     }
 
     select {

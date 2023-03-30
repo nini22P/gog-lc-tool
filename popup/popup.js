@@ -1,7 +1,7 @@
-const regionInput = document.getElementById('region-select')
-const languageInput = document.getElementById('language-select')
+const regionSelect = document.getElementById('region-select')
 const saveButton = document.getElementById('save')
 const resetButton = document.getElementById('reset')
+let currentLanguage = null
 
 const reset = () => {
     chrome.cookies.remove({
@@ -11,8 +11,8 @@ const reset = () => {
 }
 
 const save = () => {
-    const region = regionInput.value
-    const language = languageInput.value
+    const region = regionSelect.value
+    const language = currentLanguage
 
     chrome.cookies.set({
         url: 'https://www.gog.com',
@@ -25,18 +25,37 @@ const save = () => {
 }
 
 const restore = () => {
-    chrome.cookies.get({ url: 'https://www.gog.com', name: 'gog_lc' }, (cookie) => {
+    chrome.cookies.get({
+        url: 'https://www.gog.com',
+        name: 'gog_lc'
+    }, (cookie) => {
         if (cookie) {
             const [region, currency, language] = cookie.value.split('_')
-            regionInput.value = `${region}_${currency}`
-            languageInput.value = language
+            regionSelect.value = `${region}_${currency}`
+            currentLanguage = language
         }
     })
 }
 
 const reloadPage = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+
+    chrome.tabs.query({
+        active: true,
+        currentWindow: true
+    }, (tabs) => {
         chrome.tabs.reload(tabs[0].id)
+    })
+}
+
+const checkSite = () => {
+    chrome.tabs.query({
+        active: true,
+        currentWindow: true
+    }, (tabs) => {
+        if (!/gog\.com/.test(tabs[0].url)) {
+            document.querySelector('body')
+                .innerHTML = '<h2 class="max-content-width">Please open in <a href="https://www.gog.com" target="_blank">gog.com</a></h2>'
+        }
     })
 }
 
@@ -50,4 +69,7 @@ resetButton.addEventListener('click', () => {
     reloadPage()
 })
 
-document.addEventListener('DOMContentLoaded', restore)
+document.addEventListener('DOMContentLoaded', () => {
+    checkSite()
+    restore()
+})
