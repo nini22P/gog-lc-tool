@@ -13,15 +13,48 @@ a {
     width: max-content;
 }
 
-select {
-    font-size: 1rem;
-    padding: 0.25rem;
-    width: max-content;
+fieldset {
     border: none;
-    border-radius: 0.25rem;
+    padding: 0;
+    margin: 0 0 0.5rem 0;
+}
+
+legend {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+#radio-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 0.4rem;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
     cursor: pointer;
-    outline: none;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    font-size: 0.9rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+}
+
+.radio-group label:has(input:checked) {
+    background-color: #5f0d63;
+    color: #fff;
+}
+
+.radio-group input[type="radio"] {
+    margin: 0;
+    accent-color: #5f0d63;
+    cursor: pointer;
 }
 
 .hide {
@@ -65,9 +98,13 @@ select {
         color: #ac3bb0
     }
 
-    select {
-        background-color: #000;
-        color: #f7f7f7;
+    .radio-group label:has(input:checked) {
+        background-color: #ac3bb0;
+        color: #fff;
+    }
+
+    .radio-group input[type="radio"] {
+        accent-color: #ac3bb0;
     }
 
     .btn {
