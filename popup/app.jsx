@@ -21,27 +21,28 @@ const checkSite = (setInvalid) => {
     })
 }
 
-const restore = (setRegion, setCurrency) => {
+const restore = (setRegion, setCurrency, setLanguage) => {
     chrome.cookies.get({
         url: 'https://www.gog.com',
         name: 'gog_lc'
     }, (cookie) => {
         if (cookie) {
-            const [r, c] = cookie.value.split('_')
+            const [r, c, l] = cookie.value.split('_')
             if (regionMap[r] && regionMap[r].currencies.includes(c)) {
                 setRegion(r)
                 setCurrency(c)
+                setLanguage(l || 'en')
             }
         }
     })
 }
 
-const saveCookie = (region, currency) => {
+const saveCookie = (region, currency, language) => {
     if (!region || !currency) return
     chrome.cookies.set({
         url: 'https://www.gog.com',
         name: 'gog_lc',
-        value: `${region}_${currency}_en`,
+        value: `${region}_${currency}_${language || 'en'}`,
         domain: '.gog.com',
     })
 }
@@ -63,10 +64,11 @@ const App = () => {
     const [invalid, setInvalid] = useState(false)
     const [region, setRegion] = useState(null)
     const [currency, setCurrency] = useState(null)
+    const [language, setLanguage] = useState(null)
 
     useEffect(() => {
         checkSite(setInvalid)
-        restore(setRegion, setCurrency)
+        restore(setRegion, setCurrency, setLanguage)
     }, [])
 
     const currencies = region ? regionMap[region].currencies : []
@@ -78,7 +80,7 @@ const App = () => {
     }
 
     const handleSave = () => {
-        saveCookie(region, currency)
+        saveCookie(region, currency, language)
         reloadPage()
     }
 
