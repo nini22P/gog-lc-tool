@@ -1,17 +1,17 @@
 import { render } from 'preact'
 import { useState, useEffect } from 'preact/hooks'
 
-const regionCurrencyMap = {
-    AR: ['USD'],
-    CN: ['CNY', 'USD'],
-    JP: ['USD'],
-    RU: ['RUB', 'USD'],
-    TR: ['TRY', 'USD'],
-    UA: ['USD'],
-    US: ['USD'],
+const regionMap = {
+    AR: { name: 'Argentina', currencies: ['USD'] },
+    CN: { name: 'China', currencies: ['CNY', 'USD'] },
+    JP: { name: 'Japan', currencies: ['USD'] },
+    RU: { name: 'Russia', currencies: ['RUB', 'USD'] },
+    TR: { name: 'Turkey', currencies: ['TRY', 'USD'] },
+    UA: { name: 'Ukraine', currencies: ['USD'] },
+    US: { name: 'United States', currencies: ['USD'] },
 }
 
-const regions = Object.keys(regionCurrencyMap)
+const regions = Object.keys(regionMap)
 
 const checkSite = (setInvalid) => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -21,36 +21,28 @@ const checkSite = (setInvalid) => {
     })
 }
 
-const restore = (setRegion, setCurrency, setLanguage) => {
+const restore = (setRegion, setCurrency) => {
     chrome.cookies.get({
         url: 'https://www.gog.com',
         name: 'gog_lc'
     }, (cookie) => {
         if (cookie) {
-            const [r, c, l] = cookie.value.split('_')
-            setRegion(r)
-            setCurrency(c)
-            setLanguage(l)
-        } else {
-            setRegion('CN')
-            setCurrency('CNY')
+            const [r, c] = cookie.value.split('_')
+            if (regionMap[r] && regionMap[r].currencies.includes(c)) {
+                setRegion(r)
+                setCurrency(c)
+            }
         }
     })
 }
 
-const saveCookie = (region, currency, language) => {
+const saveCookie = (region, currency) => {
     if (!region || !currency) return
     chrome.cookies.set({
         url: 'https://www.gog.com',
         name: 'gog_lc',
-        value: `${region}_${currency}_${language}`,
+        value: `${region}_${currency}_en`,
         domain: '.gog.com',
-    })
-}
-
-const reloadPage = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.reload(tabs[0].id)
     })
 }
 
@@ -61,27 +53,32 @@ const resetCookie = () => {
     })
 }
 
+const reloadPage = () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.tabs.reload(tabs[0].id)
+    })
+}
+
 const App = () => {
     const [invalid, setInvalid] = useState(false)
     const [region, setRegion] = useState(null)
     const [currency, setCurrency] = useState(null)
-    const [language, setLanguage] = useState(null)
 
     useEffect(() => {
         checkSite(setInvalid)
-        restore(setRegion, setCurrency, setLanguage)
+        restore(setRegion, setCurrency)
     }, [])
 
-    const currencies = region ? regionCurrencyMap[region] : []
+    const currencies = region ? regionMap[region].currencies : []
 
     const handleRegionChange = (e) => {
         const r = e.target.value
         setRegion(r)
-        setCurrency(regionCurrencyMap[r][0])
+        setCurrency(regionMap[r].currencies[0])
     }
 
     const handleSave = () => {
-        saveCookie(region, currency, language)
+        saveCookie(region, currency)
         reloadPage()
     }
 
@@ -100,7 +97,7 @@ const App = () => {
                 <fieldset class="radio-group">
                     <legend>Region</legend>
                     {regions.map(r => (
-                        <label key={r}>
+                        <label key={r} title={regionMap[r].name}>
                             <input type="radio" name="region" value={r} checked={region === r} onChange={handleRegionChange} /> {r}
                         </label>
                     ))}
